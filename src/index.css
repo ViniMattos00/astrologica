@@ -1,0 +1,12 @@
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+body {
+  @apply bg-background text-white font-sans antialiased;
+  min-height: 100vh;
+}
+
+#root {
+  @apply min-h-screen bg-background;
+}
