@@ -2,11 +2,92 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 
+/* ── Base ──────────────────────────────────────────────────────────────────── */
 body {
-  @apply bg-background text-white font-sans antialiased;
+  @apply bg-background text-white antialiased;
   min-height: 100vh;
+  font-family: 'Rajdhani', 'Space Mono', system-ui, sans-serif;
 }
 
 #root {
   @apply min-h-screen bg-background;
 }
+
+/* ── Custom scrollbar ──────────────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.08);
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,0.16);
+}
+
+/* ── Keyframe animations ───────────────────────────────────────────────────── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0);     }
+}
+
+@keyframes fadeInScale {
+  from { opacity: 0; transform: scale(0.92); }
+  to   { opacity: 1; transform: scale(1);    }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(24px); }
+  to   { opacity: 1; transform: translateX(0);    }
+}
+
+@keyframes starDrop {
+  0%   { opacity: 0; transform: translateY(-20px) scale(0.5); }
+  60%  { opacity: 1; transform: translateY(4px)   scale(1.15); }
+  100% { opacity: 1; transform: translateY(0)     scale(1);   }
+}
+
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 8px rgba(var(--color-accent), 0.25); }
+  50%       { box-shadow: 0 0 20px rgba(var(--color-accent), 0.55); }
+}
+
+@keyframes successBurst {
+  0%   { transform: scale(1);    opacity: 1; }
+  50%  { transform: scale(1.18); opacity: 0.9; }
+  100% { transform: scale(1);    opacity: 1; }
+}
+
+/* ── Utility animation classes ─────────────────────────────────────────────── */
+.animate-fade-in-up {
+  animation: fadeInUp 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-fade-in-scale {
+  animation: fadeInScale 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-slide-right {
+  animation: slideInRight 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-success {
+  animation: successBurst 0.5s ease both;
+}
+
+.animate-glow {
+  animation: glowPulse 2.2s ease-in-out infinite;
+}
+
+.animate-star-drop {
+  animation: starDrop 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ── Star delay helpers (for staggered star animations) ───────────────────── */
+.star-delay-1 { animation-delay: 0.05s; }
+.star-delay-2 { animation-delay: 0.18s; }
+.star-delay-3 { animation-delay: 0.31s; }

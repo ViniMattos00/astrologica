@@ -34,77 +34,145 @@ function createPhase(id: string, title: string, config: PhaseConfig): PhaseDefin
 }
 
 export const PHASES: PhaseDefinition[] = [
-  createPhase("phase-01-basic", "Ponto de Partida", {
+  // ── Fase 1 ───────────────────────────────────────────────────────────────
+  createPhase("phase_1", "Ponto de Partida", {
     rows: ["S..A"],
-    description: "Aprenda a mover o rover passo a passo até o astronauta.",
+    description: "Aprenda a mover o rover até o astronauta.",
     availableCommands: ["move_forward", "turn_left", "turn_right"],
     objectives: [
       { id: "reach", label: "Resgate", description: "Alcance o astronauta." },
-      { id: "commands", label: "Eficiência", description: "Use no máximo 3 comandos." },
+      { id: "optimal", label: "Eficiência", description: "Use apenas 3 blocos." },
     ],
-    optimal: {
-      commands: 3,
-      notes: "Mover, mover, mover",
-    },
-    ambientHint: "Observe a orientação inicial do rover.",
+    optimal: { commands: 3 },
+    ambientHint: "O rover começa olhando para o leste (→). Mova-o diretamente!",
   }),
-  createPhase("phase-02-obstacles", "Terreno Pedregoso", {
+
+  // ── Fase 2 ───────────────────────────────────────────────────────────────
+  createPhase("phase_2", "Primeira Curva", {
     rows: [
-      "S#..",
-      "..#A",
+      "S..",
+      "..A",
     ],
-    description: "Desvie de obstáculos e planeje uma rota segura.",
-    availableCommands: ["move_forward", "turn_left", "turn_right", "if_path_clear"],
+    description: "Navegue em L até o astronauta.",
+    availableCommands: ["move_forward", "turn_left", "turn_right"],
     objectives: [
-      { id: "avoid", label: "Evite colisões", description: "Não bata em nenhum obstáculo." },
-      { id: "reach", label: "Resgate", description: "Chegue até o astronauta." },
+      { id: "reach", label: "Resgate", description: "Alcance o astronauta." },
+      { id: "optimal", label: "Eficiência", description: "Use 4 blocos ou menos." },
     ],
-    optimal: {
-      commands: 6,
-    },
-    ambientHint: "Experimente validar se o caminho está livre antes de avançar.",
+    optimal: { commands: 4 },
+    ambientHint: "Avance, gire para o sul (↓) e avance de novo.",
   }),
-  createPhase("phase-03-loops", "Caminho Repetitivo", {
-    rows: [
-      "S...A",
-      "#####",
-      ".....",
-    ],
-    description: "Use loops para otimizar trajetos longos.",
+
+  // ── Fase 3 ───────────────────────────────────────────────────────────────
+  createPhase("phase_3", "Corredor Estelar", {
+    rows: ["S......A"],
+    description: "Use um loop para percorrer o longo corredor.",
     availableCommands: ["move_forward", "turn_left", "turn_right", "loop"],
     objectives: [
-      { id: "loop", label: "Repetição", description: "Use pelo menos um bloco de repetição." },
-      { id: "reach", label: "Resgate", description: "Leve o rover até o astronauta." },
+      { id: "reach", label: "Resgate", description: "Alcance o astronauta." },
+      { id: "loop", label: "Loop", description: "Use um bloco de repetição." },
+      { id: "optimal", label: "Eficiência", description: "Use apenas 2 blocos." },
     ],
-    optimal: {
-      commands: 4,
-      notes: "Faça o rover repetir movimentos em linha reta.",
-    },
+    optimal: { commands: 2, notes: "loop(7){ mover } = 2 blocos" },
+    ambientHint: "Um loop com 7 repetições percorre todo o corredor com só 2 blocos!",
   }),
-  createPhase("phase-04-conditionals", "Cavernas de Gelo", {
+
+  // ── Fase 4 ───────────────────────────────────────────────────────────────
+  createPhase("phase_4", "Labirinto Lunar", {
     rows: [
-      "S#..A",
-      "..#..",
-      "..#..",
+      "S.....",
+      "#####.",
+      "....A.",
     ],
-    description: "Combine condicionais para adaptar a missão em tempo real.",
+    description: "Contorne a barreira e alcance o astronauta pelo sul.",
+    availableCommands: ["move_forward", "turn_left", "turn_right", "loop"],
+    objectives: [
+      { id: "reach", label: "Resgate", description: "Alcance o astronauta." },
+      { id: "optimal", label: "Eficiência", description: "Use 5 blocos ou menos." },
+    ],
+    optimal: { commands: 5 },
+    ambientHint: "Vá até o final da parede, desça, depois volte pelo corredor inferior.",
+  }),
+
+  // ── Fase 5 ───────────────────────────────────────────────────────────────
+  createPhase("phase_5", "Terreno Pedregoso", {
+    rows: [
+      "S.#.",
+      "...A",
+    ],
+    description: "Use condicionais para navegar por terreno com obstáculos.",
+    availableCommands: ["move_forward", "turn_left", "turn_right", "if_path_clear", "if_obstacle_ahead"],
+    objectives: [
+      { id: "reach", label: "Resgate", description: "Alcance o astronauta." },
+      { id: "condition", label: "Condicional", description: "Use pelo menos uma condição." },
+      { id: "optimal", label: "Eficiência", description: "Use 6 blocos ou menos." },
+    ],
+    optimal: { commands: 6 },
+    ambientHint: "Verifique se o caminho está livre antes de avançar.",
+  }),
+
+  // ── Fase 6 ───────────────────────────────────────────────────────────────
+  createPhase("phase_6", "Caminho Serpentino", {
+    rows: [
+      "S....",
+      "####.",
+      ".####",
+      "....A",
+    ],
+    description: "Navegue por um labirinto em zigue-zague.",
+    availableCommands: ["move_forward", "turn_left", "turn_right", "loop"],
+    objectives: [
+      { id: "reach", label: "Resgate", description: "Alcance o astronauta." },
+      { id: "loop", label: "Loop", description: "Use um bloco de repetição." },
+      { id: "optimal", label: "Eficiência", description: "Use 9 blocos ou menos." },
+    ],
+    optimal: { commands: 9 },
+    ambientHint: "O caminho faz curvas em S — planeje cada giro com cuidado.",
+  }),
+
+  // ── Fase 7 ───────────────────────────────────────────────────────────────
+  createPhase("phase_7", "Tempestade de Areia", {
+    rows: [
+      "S.#..",
+      "..#..",
+      "#....",
+      "....A",
+    ],
+    description: "Múltiplos obstáculos exigem planejamento cuidadoso.",
     availableCommands: [
-      "move_forward",
-      "turn_left",
-      "turn_right",
-      "loop",
-      "if_path_clear",
-      "if_obstacle_ahead",
+      "move_forward", "turn_left", "turn_right",
+      "loop", "if_path_clear", "if_obstacle_ahead",
     ],
     objectives: [
-      { id: "condition", label: "Condicionais", description: "Utilize pelo menos uma condição if." },
-      { id: "reach", label: "Resgate", description: "Encontre o astronauta." },
-      { id: "optimize", label: "Otimização", description: "Fique a no máximo 2 comandos da solução ótima." },
+      { id: "reach", label: "Resgate", description: "Alcance o astronauta." },
+      { id: "condition", label: "Condicional", description: "Use condicionais para desviar." },
+      { id: "optimal", label: "Eficiência", description: "Use 5 blocos ou menos." },
     ],
-    optimal: {
-      commands: 8,
-    },
-    ambientHint: "Monitore o que há à frente antes de decidir mover.",
+    optimal: { commands: 5 },
+    ambientHint: "Há um caminho livre de 5 blocos — encontre-o!",
+  }),
+
+  // ── Fase 8 ───────────────────────────────────────────────────────────────
+  createPhase("phase_8", "Base Orbital", {
+    rows: [
+      "S...#",
+      ".###.",
+      ".....",
+      ".###.",
+      "....A",
+    ],
+    description: "O desafio final: um labirinto em espiral dentro da base.",
+    availableCommands: [
+      "move_forward", "turn_left", "turn_right",
+      "loop", "if_path_clear", "if_obstacle_ahead",
+    ],
+    objectives: [
+      { id: "reach", label: "Resgate", description: "Alcance o astronauta." },
+      { id: "loop", label: "Loop", description: "Use pelo menos um loop." },
+      { id: "optimal", label: "Eficiência", description: "Use 6 blocos ou menos." },
+    ],
+    optimal: { commands: 6 },
+    ambientHint: "A solução elegante usa a simetria do labirinto a seu favor.",
   }),
 ];
 

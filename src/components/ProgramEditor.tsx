@@ -17,58 +17,9 @@ import { COMMAND_DEFINITIONS } from "../core/commandCatalog";
 import type { CommandBlock, CommandType } from "../core/types";
 import { useGameStore } from "../state/gameStore";
 import type { ProgramBranch } from "../core/programUtils";
+import { COMMAND_STYLE } from "./CommandPalette";
 
 type ContainerId = string;
-
-interface AddCommandMenuProps {
-  commands: CommandType[];
-  onAdd: (command: CommandType) => void;
-  label?: string;
-}
-
-function AddCommandMenu({ commands, onAdd, label = "Adicionar" }: AddCommandMenuProps) {
-  const [open, setOpen] = useState(false);
-
-  if (!open) {
-    return (
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        className="mt-2 inline-flex items-center gap-2 rounded-md border border-accent/40 px-2 py-1 text-xs font-semibold text-accent hover:border-accent"
-      >
-        + {label}
-      </button>
-    );
-  }
-
-  return (
-    <div className="mt-2 rounded-md border border-accent/40 bg-panel-dark p-2">
-      <p className="mb-2 text-xs font-semibold text-text-secondary">Selecionar bloco</p>
-      <div className="grid gap-1">
-        {commands.map((command) => (
-          <button
-            key={command}
-            type="button"
-            onClick={() => {
-              onAdd(command);
-              setOpen(false);
-            }}
-            className="rounded border border-accent/30 px-2 py-1 text-left text-xs text-white transition hover:border-accent"
-          >
-            {COMMAND_DEFINITIONS[command].label}
-          </button>
-        ))}
-      </div>
-      <button
-        type="button"
-        onClick={() => setOpen(false)}
-        className="mt-3 w-full rounded bg-danger/20 px-2 py-1 text-xs text-danger hover:bg-danger/30"
-      >
-        cancelar
-      </button>
-    </div>
-  );
-}
 
 interface DragMeta {
   type: "block";
@@ -103,6 +54,56 @@ function parseContainerId(containerId: ContainerId): { parentId: string | null; 
   return { parentId: null, branch: "root" };
 }
 
+// ── Inner "Add block" dropdown ────────────────────────────────────────────────
+interface AddBlockMenuProps {
+  commands: CommandType[];
+  onAdd: (command: CommandType) => void;
+}
+
+function AddBlockMenu({ commands, onAdd }: AddBlockMenuProps) {
+  const [open, setOpen] = useState(false);
+
+  if (!open) {
+    return (
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="mt-2 inline-flex items-center gap-1.5 rounded border border-white/10 px-2 py-1 text-xs text-text-secondary hover:border-white/25 hover:text-white transition"
+      >
+        + bloco
+      </button>
+    );
+  }
+
+  return (
+    <div className="mt-2 rounded-lg border border-white/10 bg-background p-2 space-y-1">
+      {commands.map((command) => {
+        const style = COMMAND_STYLE[command];
+        return (
+          <button
+            key={command}
+            type="button"
+            onClick={() => { onAdd(command); setOpen(false); }}
+            style={{ borderLeftColor: style.border, borderLeftWidth: 3, background: style.glow }}
+            className="flex w-full items-center gap-2 rounded border border-white/5 px-2 py-1 text-xs text-white hover:border-white/20 transition"
+          >
+            <span style={{ color: style.border }}>{style.icon}</span>
+            {COMMAND_DEFINITIONS[command].label}
+          </button>
+        );
+      })}
+      <button
+        type="button"
+        onClick={() => setOpen(false)}
+        className="mt-1 w-full text-xs text-text-secondary hover:text-white transition"
+      >
+        cancelar
+      </button>
+    </div>
+  );
+}
+
+// ── Droppable container ───────────────────────────────────────────────────────
 interface ProgramContainerProps {
   containerId: ContainerId;
   blocks: CommandBlock[];
@@ -111,6 +112,7 @@ interface ProgramContainerProps {
   availableCommands: CommandType[];
   onAddCommand: (command: CommandType, branch: ProgramBranch, parentId: string | null) => void;
   renderNode: (block: CommandBlock, index: number, containerId: ContainerId, parentId: string | null, branch: ProgramBranch) => JSX.Element;
+  label?: string;
 }
 
 function ProgramContainer({
@@ -121,28 +123,32 @@ function ProgramContainer({
   availableCommands,
   onAddCommand,
   renderNode,
+  label,
 }: ProgramContainerProps) {
   const { setNodeRef, isOver } = useDroppable({
     id: containerId,
     data: { type: "container", containerId, parentId, branch, length: blocks.length } satisfies ContainerMeta,
   });
 
-  const outline = isOver ? "border-accent" : "border-panel-dark";
-
   return (
-    <div ref={setNodeRef} className={`rounded-lg border ${outline} bg-panel/60 p-3 transition`}>
-      <SortableContext
-        items={blocks.map((block) => block.id)}
-        strategy={verticalListSortingStrategy}
-      >
-        <div className="space-y-3">
+    <div
+      ref={setNodeRef}
+      className={`rounded-lg border p-2 transition ${
+        isOver ? "border-accent/60 bg-accent/5" : "border-white/8 bg-white/2"
+      }`}
+    >
+      {label && (
+        <p className="mb-1.5 text-[10px] font-bold uppercase tracking-widest text-text-secondary">{label}</p>
+      )}
+      <SortableContext items={blocks.map((b) => b.id)} strategy={verticalListSortingStrategy}>
+        <div className="space-y-2 min-h-[28px]">
           {blocks.length === 0 && (
-            <p className="text-sm text-text-secondary">Arraste blocos aqui ou adicione abaixo.</p>
+            <p className="text-xs text-text-secondary/50 px-1">— vazio —</p>
           )}
           {blocks.map((block, index) => renderNode(block, index, containerId, parentId, branch))}
         </div>
       </SortableContext>
-      <AddCommandMenu
+      <AddBlockMenu
         commands={availableCommands}
         onAdd={(command) => onAddCommand(command, branch, parentId)}
       />
@@ -150,6 +156,7 @@ function ProgramContainer({
   );
 }
 
+// ── Sortable block node ───────────────────────────────────────────────────────
 interface ProgramNodeProps {
   block: CommandBlock;
   index: number;
@@ -174,6 +181,8 @@ function ProgramNode({
   onUpdateParams,
 }: ProgramNodeProps) {
   const definition = COMMAND_DEFINITIONS[block.type];
+  const style = COMMAND_STYLE[block.type];
+
   const {
     attributes,
     listeners,
@@ -183,70 +192,76 @@ function ProgramNode({
     isDragging,
   } = useSortable({
     id: block.id,
-    data: {
-      type: "block",
-      blockId: block.id,
-      containerId,
-      index,
-      parentId,
-      branch,
-    } satisfies DragMeta,
+    data: { type: "block", blockId: block.id, containerId, index, parentId, branch } satisfies DragMeta,
   });
 
-  const style: React.CSSProperties = {
+  const cssStyle: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
     transition,
-    opacity: isDragging ? 0.5 : 1,
+    opacity: isDragging ? 0.45 : 1,
+    borderLeftColor: style.border,
+    borderLeftWidth: 3,
+    background: style.glow,
   };
 
   return (
     <div
       ref={setNodeRef}
-      style={style}
-      className="rounded-lg border border-accent/30 bg-panel p-3 text-sm text-white shadow-sm"
+      style={cssStyle}
+      className="rounded-lg border border-white/8 text-sm text-white"
     >
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <p className="font-semibold">{definition.label}</p>
-          <p className="text-xs text-text-secondary">{definition.description}</p>
-        </div>
-        <div className="flex gap-2">
-          <button
-            type="button"
-            className="rounded border border-accent/40 px-2 py-1 text-xs text-accent"
-            {...attributes}
-            {...listeners}
-          >
-            mover
-          </button>
-          <button
-            type="button"
-            onClick={() => onRemoveCommand(block.id)}
-            className="rounded border border-danger/40 px-2 py-1 text-xs text-danger hover:border-danger"
-          >
-            excluir
-          </button>
-        </div>
+      {/* Block header row */}
+      <div className="flex items-center gap-2 px-2.5 py-2">
+        {/* Drag handle */}
+        <span
+          {...attributes}
+          {...listeners}
+          className="cursor-grab text-text-secondary select-none text-base leading-none hover:text-white"
+          title="Arrastar"
+        >
+          ⠿
+        </span>
+
+        {/* Icon */}
+        <span style={{ color: style.border }} className="text-sm leading-none shrink-0">
+          {style.icon}
+        </span>
+
+        {/* Label */}
+        <span className="flex-1 font-semibold text-xs leading-tight">{definition.label}</span>
+
+        {/* Remove */}
+        <button
+          type="button"
+          onClick={() => onRemoveCommand(block.id)}
+          className="rounded px-1.5 py-0.5 text-xs text-text-secondary hover:bg-danger/20 hover:text-danger transition"
+          title="Remover"
+        >
+          ×
+        </button>
       </div>
 
+      {/* Loop repetition input */}
       {block.type === "loop" && (
-        <div className="mt-3">
-          <label className="text-xs uppercase text-text-secondary">repetições</label>
+        <div className="flex items-center gap-2 border-t border-white/6 px-2.5 py-1.5">
+          <label className="text-[10px] uppercase tracking-wider text-text-secondary">repetir</label>
           <input
             type="number"
             min={1}
+            max={99}
             value={block.params?.count ?? 2}
-            onChange={(event) =>
-              onUpdateParams(block.id, { count: Math.max(1, Number.parseInt(event.target.value, 10) || 1) })
+            onChange={(e) =>
+              onUpdateParams(block.id, { count: Math.max(1, Number.parseInt(e.target.value, 10) || 1) })
             }
-            className="mt-1 w-24 rounded border border-panel-dark bg-panel-dark px-2 py-1 text-sm text-white"
+            className="w-14 rounded border border-white/10 bg-background px-2 py-0.5 text-xs text-white text-center"
           />
+          <span className="text-[10px] text-text-secondary">×</span>
         </div>
       )}
 
+      {/* Children (loop body / if-true branch) */}
       {definition.supportsChildren && (
-        <div className="mt-3 space-y-2">
-          <p className="text-xs font-semibold uppercase text-text-secondary">Blocos internos</p>
+        <div className="border-t border-white/6 px-2.5 py-2">
           <ProgramContainer
             containerId={buildContainerId("children", block.id)}
             blocks={block.children ?? []}
@@ -254,6 +269,7 @@ function ProgramNode({
             branch="children"
             availableCommands={availableCommands}
             onAddCommand={onAddCommand}
+            label={block.type === "loop" ? "corpo do loop" : "se verdadeiro"}
             renderNode={(child, childIndex, childContainerId, childParentId, childBranch) => (
               <ProgramNode
                 key={child.id}
@@ -272,9 +288,9 @@ function ProgramNode({
         </div>
       )}
 
+      {/* Else branch */}
       {definition.supportsElse && (
-        <div className="mt-3 space-y-2">
-          <p className="text-xs font-semibold uppercase text-text-secondary">Blocos caso contrário</p>
+        <div className="border-t border-white/6 px-2.5 py-2">
           <ProgramContainer
             containerId={buildContainerId("elseChildren", block.id)}
             blocks={block.elseChildren ?? []}
@@ -282,6 +298,7 @@ function ProgramNode({
             branch="elseChildren"
             availableCommands={availableCommands}
             onAddCommand={onAddCommand}
+            label="senão"
             renderNode={(child, childIndex, childContainerId, childParentId, childBranch) => (
               <ProgramNode
                 key={child.id}
@@ -303,6 +320,7 @@ function ProgramNode({
   );
 }
 
+// ── Main export ───────────────────────────────────────────────────────────────
 interface ProgramEditorProps {
   commands: CommandType[];
 }
@@ -324,11 +342,13 @@ export function ProgramEditor({ commands }: ProgramEditorProps) {
     updateCommandParams: state.updateCommandParams,
   }));
 
-  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+  );
 
   const handleDragEnd = (event: DragEndEvent) => {
     const activeMeta = event.active.data.current as DragMeta | undefined;
-    const overMeta = event.over?.data.current as (DragMeta | ContainerMeta | undefined);
+    const overMeta = event.over?.data.current as DragMeta | ContainerMeta | undefined;
     if (!activeMeta || activeMeta.type !== "block" || !overMeta) return;
 
     let targetContainerId: ContainerId;
@@ -346,12 +366,8 @@ export function ProgramEditor({ commands }: ProgramEditorProps) {
     let adjustedIndex = targetIndex;
 
     if (originContainerId === targetContainerId) {
-      if (adjustedIndex > activeMeta.index) {
-        adjustedIndex -= 1;
-      }
-      if (adjustedIndex === activeMeta.index) {
-        return;
-      }
+      if (adjustedIndex > activeMeta.index) adjustedIndex -= 1;
+      if (adjustedIndex === activeMeta.index) return;
     }
 
     const { parentId, branch } = parseContainerId(targetContainerId);
@@ -382,18 +398,10 @@ export function ProgramEditor({ commands }: ProgramEditorProps) {
   );
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-white">Programa</h2>
-        <button
-          type="button"
-          onClick={() => appendCommand(commands[0])}
-          className="rounded-md border border-accent/40 px-3 py-1 text-sm text-accent hover:border-accent"
-        >
-          + adicionar ao final
-        </button>
-      </div>
-
+    <div className="space-y-3">
+      <h2 className="text-base font-semibold uppercase tracking-widest text-text-secondary">
+        Programa
+      </h2>
       <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
         <ProgramContainer
           containerId="root"
@@ -401,7 +409,7 @@ export function ProgramEditor({ commands }: ProgramEditorProps) {
           parentId={null}
           branch="root"
           availableCommands={commands}
-          onAddCommand={(command, _branch, _parentId) => appendCommand(command)}
+          onAddCommand={(command) => appendCommand(command)}
           renderNode={renderNode}
         />
       </DndContext>

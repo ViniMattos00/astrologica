@@ -259,10 +259,7 @@ export function calculateCommandUsage(blocks: CommandBlock[]): number {
   return blocks.reduce((total, block) => {
     const inner = (block.children ? calculateCommandUsage(block.children) : 0) +
       (block.elseChildren ? calculateCommandUsage(block.elseChildren) : 0);
-    if (block.type === "loop") {
-      const repetitions = Math.max(1, block.params?.count ?? 1);
-      return total + inner * repetitions; // approximated usage
-    }
+    // Count each block once (not multiplied by loop iterations) so loops reward efficiency
     return total + 1 + inner;
   }, 0);
 }
