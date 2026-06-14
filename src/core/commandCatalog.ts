@@ -52,6 +52,24 @@ export const COMMAND_DEFINITIONS: Record<CommandType, CommandDefinition> = {
     supportsElse: true,
     unlockPhase: "phase-04-conditionals",
   },
+  do_while_path_clear: {
+    type: "do_while_path_clear",
+    label: "Faça enquanto livre",
+    description: "Executa os blocos internos ao menos uma vez e repete enquanto o caminho estiver livre.",
+    color: "bg-panel-dark",
+    accent: "border-accent",
+    supportsChildren: true,
+    unlockPhase: "phase_9",
+  },
+  do_while_obstacle_ahead: {
+    type: "do_while_obstacle_ahead",
+    label: "Faça enquanto obstáculo",
+    description: "Executa os blocos internos ao menos uma vez e repete enquanto houver obstáculo à frente.",
+    color: "bg-panel-dark",
+    accent: "border-warning",
+    supportsChildren: true,
+    unlockPhase: "phase_9",
+  },
 };
 
 export const DEFAULT_PROGRAM: CommandType[] = [

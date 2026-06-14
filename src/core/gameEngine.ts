@@ -141,6 +141,26 @@ function processBlock(block: CommandBlock, options: TraverseOptions) {
     return;
   }
 
+  if (block.type === "do_while_path_clear" || block.type === "do_while_obstacle_ahead") {
+    const MAX_ITERATIONS = 200;
+    let iterations = 0;
+    // do-while: execute body at least once, then check condition
+    do {
+      if (context.reachedAstronaut || iterations >= MAX_ITERATIONS) break;
+      traverseBlocks(block.children ?? [], {
+        context,
+        steps,
+        commandPath: `${commandPath}/do-while-${iterations}`,
+      });
+      iterations += 1;
+    } while (
+      !context.reachedAstronaut &&
+      iterations < MAX_ITERATIONS &&
+      (block.type === "do_while_path_clear" ? isPathClear(context) : !isPathClear(context))
+    );
+    return;
+  }
+
   if (block.type === "if_path_clear" || block.type === "if_obstacle_ahead") {
     const pathClear = isPathClear(context);
     const shouldRunPrimary = block.type === "if_path_clear" ? pathClear : !pathClear;

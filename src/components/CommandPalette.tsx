@@ -2,12 +2,14 @@ import { COMMAND_DEFINITIONS } from "../core/commandCatalog";
 import type { CommandType } from "../core/types";
 
 export const COMMAND_STYLE: Record<CommandType, { border: string; glow: string; icon: string }> = {
-  move_forward:      { border: "#3b82f6", glow: "rgba(59,130,246,0.15)",  icon: "▲" },
-  turn_left:         { border: "#8b5cf6", glow: "rgba(139,92,246,0.15)",  icon: "↺" },
-  turn_right:        { border: "#8b5cf6", glow: "rgba(139,92,246,0.15)",  icon: "↻" },
-  loop:              { border: "#f97316", glow: "rgba(249,115,22,0.15)",   icon: "⟳" },
-  if_path_clear:     { border: "#22c55e", glow: "rgba(34,197,94,0.15)",   icon: "?" },
-  if_obstacle_ahead: { border: "#eab308", glow: "rgba(234,179,8,0.15)",   icon: "!" },
+  move_forward:           { border: "#3b82f6", glow: "rgba(59,130,246,0.15)",   icon: "▲" },
+  turn_left:              { border: "#8b5cf6", glow: "rgba(139,92,246,0.15)",   icon: "↺" },
+  turn_right:             { border: "#8b5cf6", glow: "rgba(139,92,246,0.15)",   icon: "↻" },
+  loop:                   { border: "#f97316", glow: "rgba(249,115,22,0.15)",   icon: "⟳" },
+  if_path_clear:          { border: "#22c55e", glow: "rgba(34,197,94,0.15)",    icon: "?" },
+  if_obstacle_ahead:      { border: "#eab308", glow: "rgba(234,179,8,0.15)",    icon: "!" },
+  do_while_path_clear:    { border: "#ec4899", glow: "rgba(236,72,153,0.15)",   icon: "↻?" },
+  do_while_obstacle_ahead:{ border: "#f43f5e", glow: "rgba(244,63,94,0.15)",    icon: "↻!" },
 };
 
 interface CommandPaletteProps {

@@ -32,7 +32,9 @@ export type CommandType =
   | "turn_right"
   | "loop"
   | "if_path_clear"
-  | "if_obstacle_ahead";
+  | "if_obstacle_ahead"
+  | "do_while_path_clear"
+  | "do_while_obstacle_ahead";
 
 export interface CommandParameters {
   count?: number;

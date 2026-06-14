@@ -365,7 +365,8 @@ function App() {
                   (obj.id === "reach"     && score.reachedGoal) ||
                   (obj.id === "optimal"   && score.commandsUsed <= phase.optimal.commands) ||
                   (obj.id === "loop"      && program.some((b) => b.type === "loop")) ||
-                  (obj.id === "condition" && program.some((b) => b.type === "if_path_clear" || b.type === "if_obstacle_ahead"))
+                  (obj.id === "condition" && program.some((b) => b.type === "if_path_clear" || b.type === "if_obstacle_ahead")) ||
+                  (obj.id === "do_while"  && program.some((b) => b.type === "do_while_path_clear" || b.type === "do_while_obstacle_ahead"))
                 );
               return (
                 <div

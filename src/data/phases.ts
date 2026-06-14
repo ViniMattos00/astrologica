@@ -174,6 +174,78 @@ export const PHASES: PhaseDefinition[] = [
     optimal: { commands: 6 },
     ambientHint: "A solução elegante usa a simetria do labirinto a seu favor.",
   }),
+
+  // ── Fase 9 ───────────────────────────────────────────────────────────────
+  createPhase("phase_9", "Sensor de Parede", {
+    rows: ["S.........A"],
+    description: "Descubra o 'Faça-enquanto': execute ao menos uma vez e repita enquanto o caminho estiver livre.",
+    availableCommands: ["move_forward", "turn_left", "turn_right", "loop", "do_while_path_clear"],
+    objectives: [
+      { id: "reach",    label: "Resgate",       description: "Alcance o astronauta." },
+      { id: "do_while", label: "Faça-enquanto",  description: "Use um bloco 'Faça enquanto livre'." },
+      { id: "optimal",  label: "Eficiência",     description: "Use apenas 2 blocos." },
+    ],
+    optimal: { commands: 2, notes: "do_while_path_clear{ mover } = 2 blocos" },
+    ambientHint: "Um único 'Faça enquanto livre' com 'Mover' percorre todo o corredor automaticamente!",
+  }),
+
+  // ── Fase 10 ──────────────────────────────────────────────────────────────
+  createPhase("phase_10", "Volta Automática", {
+    rows: [
+      "S......",
+      "......A",
+    ],
+    description: "Use dois 'Faça-enquanto' para contornar a esquina sem contar passos.",
+    availableCommands: ["move_forward", "turn_left", "turn_right", "do_while_path_clear"],
+    objectives: [
+      { id: "reach",    label: "Resgate",      description: "Alcance o astronauta." },
+      { id: "do_while", label: "Faça-enquanto", description: "Use pelo menos dois blocos 'Faça enquanto livre'." },
+      { id: "optimal",  label: "Eficiência",    description: "Use 5 blocos ou menos." },
+    ],
+    optimal: { commands: 5, notes: "do_while{ mover }, virar direita, do_while{ mover } = 5 blocos" },
+    ambientHint: "Avance até a parede, vire, avance novamente — o sensor detecta a parede por você!",
+  }),
+
+  // ── Fase 11 ──────────────────────────────────────────────────────────────
+  createPhase("phase_11", "Corredor em U", {
+    rows: [
+      "S........",
+      "########.",
+      ".......A.",
+    ],
+    description: "Navegue por um longo corredor em U usando o 'Faça-enquanto' em cada segmento.",
+    availableCommands: ["move_forward", "turn_left", "turn_right", "loop", "do_while_path_clear"],
+    objectives: [
+      { id: "reach",    label: "Resgate",      description: "Alcance o astronauta." },
+      { id: "do_while", label: "Faça-enquanto", description: "Use pelo menos dois 'Faça enquanto livre'." },
+      { id: "optimal",  label: "Eficiência",    description: "Use 8 blocos ou menos." },
+    ],
+    optimal: { commands: 8, notes: "3× do_while{ mover } + 2 giros = 8 blocos" },
+    ambientHint: "Três 'Faça enquanto livre' e duas viradas à direita cobrem todo o caminho em U!",
+  }),
+
+  // ── Fase 12 ──────────────────────────────────────────────────────────────
+  createPhase("phase_12", "Labirinto Estelar", {
+    rows: [
+      "S.#.",
+      "..#.",
+      "....",
+      ".#.A",
+    ],
+    description: "O desafio final com 'Faça-enquanto': desvie de múltiplos obstáculos usando sensores automáticos.",
+    availableCommands: [
+      "move_forward", "turn_left", "turn_right",
+      "loop", "if_path_clear", "if_obstacle_ahead",
+      "do_while_path_clear", "do_while_obstacle_ahead",
+    ],
+    objectives: [
+      { id: "reach",    label: "Resgate",      description: "Alcance o astronauta." },
+      { id: "do_while", label: "Faça-enquanto", description: "Use pelo menos um 'Faça-enquanto'." },
+      { id: "optimal",  label: "Eficiência",    description: "Use 11 blocos ou menos." },
+    ],
+    optimal: { commands: 11, notes: "4× do_while{ mover } + 3 giros = 11 blocos" },
+    ambientHint: "O rover vai encontrar três obstáculos ao longo do caminho. Deixe os sensores guiarem cada segmento!",
+  }),
 ];
 
 export function getPhaseById(id: string): PhaseDefinition | undefined {

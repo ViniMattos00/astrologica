@@ -269,7 +269,13 @@ function ProgramNode({
             branch="children"
             availableCommands={availableCommands}
             onAddCommand={onAddCommand}
-            label={block.type === "loop" ? "corpo do loop" : "se verdadeiro"}
+            label={
+              block.type === "loop"
+                ? "corpo do loop"
+                : block.type === "do_while_path_clear" || block.type === "do_while_obstacle_ahead"
+                ? "corpo do faça-enquanto"
+                : "se verdadeiro"
+            }
             renderNode={(child, childIndex, childContainerId, childParentId, childBranch) => (
               <ProgramNode
                 key={child.id}
