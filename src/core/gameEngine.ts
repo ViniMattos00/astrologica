@@ -1,5 +1,6 @@
 import { nanoid } from "nanoid";
 import { DIRECTION_OFFSETS, rotateDirection } from "./directions";
+import { COMMAND_DEFINITIONS } from "./commandCatalog";
 import type {
   AstronautState,
   CommandBlock,
@@ -238,9 +239,12 @@ export function executeProgram(
 }
 
 export function createCommandBlock(type: CommandType): CommandBlock {
+  const def = COMMAND_DEFINITIONS[type];
   return {
     id: nanoid(),
     type,
+    // Seed default params from the command definition so UI and engine agree
+    params: def.defaultParams ? { ...def.defaultParams } : undefined,
     children: [],
     elseChildren: [],
   };

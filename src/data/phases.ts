@@ -116,18 +116,18 @@ export const PHASES: PhaseDefinition[] = [
     rows: [
       "S....",
       "####.",
-      ".####",
+      ".....",
       "....A",
     ],
-    description: "Navegue por um labirinto em zigue-zague.",
+    description: "Navegue pelo corredor em S usando loops.",
     availableCommands: ["move_forward", "turn_left", "turn_right", "loop"],
     objectives: [
       { id: "reach", label: "Resgate", description: "Alcance o astronauta." },
-      { id: "loop", label: "Loop", description: "Use um bloco de repetição." },
+      { id: "loop", label: "Loop", description: "Use pelo menos dois loops." },
       { id: "optimal", label: "Eficiência", description: "Use 9 blocos ou menos." },
     ],
     optimal: { commands: 9 },
-    ambientHint: "O caminho faz curvas em S — planeje cada giro com cuidado.",
+    ambientHint: "Vá à direita até a parede, desça 2 células, volte à esquerda, desça 1 e vá à direita. Loops ajudam!",
   }),
 
   // ── Fase 7 ───────────────────────────────────────────────────────────────

@@ -95,7 +95,7 @@ const ASTRONAUT_REACHED_SVG = ASTRONAUT_SVG.replace(
 // ── Lunar terrain colours ────────────────────────────────────────────────────
 const CELL_COLORS = {
   empty:     { fill: "#191b22", stroke: "#252730" },
-  obstacle:  { fill: "#23202e", stroke: "#35303f" },
+  obstacle:  { fill: "#1a0f28", stroke: "#7c3aed" },  // deep purple + vivid violet border
   start:     { fill: "#131d14", stroke: "#1e3220" },
   astronaut: { fill: "#131924", stroke: "#1e2a38" },
   beacon:    { fill: "#1a1510", stroke: "#2e2218" },
@@ -230,7 +230,8 @@ export function GameStage({ phase, snapshot, path = [] }: GameStageProps) {
                   x={px + CELL_PAD} y={py + CELL_PAD}
                   width={inner} height={inner}
                   cornerRadius={6}
-                  fill={c.fill} stroke={c.stroke} strokeWidth={1}
+                  fill={c.fill} stroke={c.stroke}
+                  strokeWidth={cell.type === "obstacle" ? 2 : 1}
                 />
 
                 {/* Craters on empty cells */}
@@ -252,8 +253,8 @@ export function GameStage({ phase, snapshot, path = [] }: GameStageProps) {
                     key={ri}
                     x={px + rd.cx} y={py + rd.cy}
                     radius={rd.r}
-                    fill="#2e2838"
-                    opacity={rd.op}
+                    fill="#6d28d9"
+                    opacity={rd.op * 1.8}
                   />
                 ))}
 

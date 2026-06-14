@@ -5,6 +5,7 @@ export interface ScoreResult {
   commandsUsed: number;
   stars: number;
   feedback: string;
+  reachedGoal: boolean;
 }
 
 export function evaluateScore(program: CommandBlock[], phase: PhaseDefinition, reachedGoal: boolean): ScoreResult {
@@ -14,6 +15,7 @@ export function evaluateScore(program: CommandBlock[], phase: PhaseDefinition, r
     return {
       commandsUsed,
       stars: 0,
+      reachedGoal: false,
       feedback: "A missão falhou. Ajuste a estratégia e tente novamente.",
     };
   }
@@ -35,6 +37,7 @@ export function evaluateScore(program: CommandBlock[], phase: PhaseDefinition, r
   return {
     commandsUsed,
     stars,
+    reachedGoal: true,
     feedback,
   };
 }
