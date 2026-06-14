@@ -39,7 +39,7 @@ function ScoreOverlay({ score, hasNext, onNext, onRetry }: ScoreOverlayProps) {
   const empty  = 3 - filled;
 
   return (
-    <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/72 backdrop-blur-sm animate-fade-in-scale">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/72 backdrop-blur-sm animate-fade-in-scale">
       <div className="rounded-2xl border border-white/10 bg-panel shadow-2xl p-8 text-center w-80">
 
         {/* Stars */}
