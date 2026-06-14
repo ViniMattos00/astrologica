@@ -94,11 +94,11 @@ const ASTRONAUT_REACHED_SVG = ASTRONAUT_SVG.replace(
 
 // ── Lunar terrain colours ────────────────────────────────────────────────────
 const CELL_COLORS = {
-  empty:     { fill: "#191b22", stroke: "#252730" },
-  obstacle:  { fill: "#1a0f28", stroke: "#7c3aed" },  // deep purple + vivid violet border
-  start:     { fill: "#131d14", stroke: "#1e3220" },
-  astronaut: { fill: "#131924", stroke: "#1e2a38" },
-  beacon:    { fill: "#1a1510", stroke: "#2e2218" },
+  empty:     { fill: "rgba(20, 18, 15, 0.78)", stroke: "#2a2620" },  // warm regolith, slightly transparent
+  obstacle:  { fill: "#1a0f28",                stroke: "#7c3aed" },  // deep purple + vivid violet border
+  start:     { fill: "rgba(12, 22, 12, 0.82)", stroke: "#1e3a1e" },
+  astronaut: { fill: "rgba(10, 16, 26, 0.82)", stroke: "#1e2a42" },
+  beacon:    { fill: "rgba(20, 14, 8, 0.82)",  stroke: "#2e2218" },
 } as const;
 
 // ── SVG → HTML Image hook ─────────────────────────────────────────────────────
@@ -149,14 +149,26 @@ export function GameStage({ phase, snapshot, path = [] }: GameStageProps) {
     [path, CS],
   );
 
-  // Stars (seeded by grid size)
+  // Stars (seeded, biased toward top half — stars live in space above the horizon)
   const stars = useMemo(() => {
     const rand = seededRandom(phase.grid.width * 997 + phase.grid.height * 37 + 13);
-    return Array.from({ length: Math.round(stageW * stageH / 700) }, () => ({
+    return Array.from({ length: Math.round(stageW * stageH / 600) }, () => ({
       x: rand() * stageW,
-      y: rand() * stageH,
-      r: rand() * 1.3 + 0.3,
-      a: rand() * 0.5 + 0.1,
+      // power-curve biases y toward 0 (top), fade out before the lower surface
+      y: Math.pow(rand(), 1.9) * stageH * 0.85,
+      r: rand() * 1.5 + 0.25,
+      a: rand() * 0.65 + 0.15,
+    }));
+  }, [phase.grid.width, phase.grid.height, stageW, stageH]);
+
+  // Large planetary craters in the background (visible through semi-transparent cells)
+  const bgCraters = useMemo(() => {
+    const rand = seededRandom(phase.grid.width * 53 + phase.grid.height * 29 + 7);
+    return Array.from({ length: 5 }, () => ({
+      x:  rand() * stageW,
+      y:  rand() * stageH * 0.9 + stageH * 0.1,
+      r:  rand() * (Math.min(stageW, stageH) * 0.38) + Math.min(stageW, stageH) * 0.08,
+      a:  rand() * 0.18 + 0.06,
     }));
   }, [phase.grid.width, phase.grid.height, stageW, stageH]);
 
@@ -206,11 +218,48 @@ export function GameStage({ phase, snapshot, path = [] }: GameStageProps) {
   return (
     <Stage width={stageW} height={stageH}>
 
-      {/* ── Layer 1: Deep space background + stars ── */}
+      {/* ── Layer 1: Space sky → lunar surface gradient + stars + bg craters ── */}
       <Layer>
-        <Rect x={0} y={0} width={stageW} height={stageH} fill="#070810" />
+        {/* Gradient: deep space (top) → warm lunar regolith (bottom) */}
+        <Rect
+          x={0} y={0} width={stageW} height={stageH}
+          fillLinearGradientStartPoint={{ x: 0, y: 0 }}
+          fillLinearGradientEndPoint={{ x: 0, y: stageH }}
+          fillLinearGradientColorStops={[
+            0,    "#020308",   // deep space black-blue
+            0.42, "#06070d",   // transition
+            0.72, "#0c0a09",   // approaching surface
+            1,    "#14100b",   // warm dark lunar regolith
+          ]}
+        />
+
+        {/* Stars — concentrated in upper space portion */}
         {stars.map((s, i) => (
           <Circle key={i} x={s.x} y={s.y} radius={s.r} fill="#ffffff" opacity={s.a} />
+        ))}
+
+        {/* Large background craters (planetary scale, show through translucent cells) */}
+        {bgCraters.map((c, i) => (
+          <Group key={`bgc-${i}`}>
+            {/* Outer rim shadow */}
+            <Circle
+              x={c.x} y={c.y} radius={c.r}
+              stroke="#1e1a14" strokeWidth={4}
+              opacity={c.a * 1.4}
+            />
+            {/* Inner rim highlight */}
+            <Circle
+              x={c.x} y={c.y} radius={c.r * 0.82}
+              stroke="#0a0906" strokeWidth={2}
+              opacity={c.a * 0.7}
+            />
+            {/* Crater floor (very subtle fill) */}
+            <Circle
+              x={c.x} y={c.y} radius={c.r * 0.78}
+              fill="#0d0b09"
+              opacity={c.a * 0.5}
+            />
+          </Group>
         ))}
       </Layer>
 
